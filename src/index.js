@@ -2,8 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-// Importar rutas (se crearán más adelante)
-// import authRoutes from './routes/auth.routes.js';
+// Importar rutas
+import authRoutes from './routes/auth.routes.js';
 // import citasRoutes from './routes/citas.routes.js';
 // import usuariosRoutes from './routes/usuarios.routes.js';
 // import serviciosRoutes from './routes/servicios.routes.js';
@@ -33,8 +33,8 @@ app.get('/', (req, res) => {
   });
 });
 
-// Rutas de la API (descomentar cuando se creen)
-// app.use('/api/auth', authRoutes);
+// Rutas de la API
+app.use('/api/auth', authRoutes);
 // app.use('/api/citas', citasRoutes);
 // app.use('/api/usuarios', usuariosRoutes);
 // app.use('/api/servicios', serviciosRoutes);
