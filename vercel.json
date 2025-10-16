@@ -13,18 +13,6 @@
       "dest": "api/index.js"
     }
   ],
-  "env": {
-    "NODE_ENV": "production",
-    "PORT": "3000",
-    "SUPABASE_URL": "https://iymqxetynnfhnkwbsypv.supabase.co",
-    "SUPABASE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5bXF4ZXR5bm5mZmt3YnN5cHYiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNzA0NzQwMCwiZXhwIjoyMDUyNjIzNDAwfQ.placeholder",
-    "SUPABASE_SERVICE_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5bXF4ZXR5bm5mZmt3YnN5cHYiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNzM3MDQ3NDAwLCJleHAiOjIwNTI2MjM0MDB9.placeholder",
-    "JWT_SECRET": "RomeroValverde200324*",
-    "JWT_EXPIRES_IN": "24h",
-    "CORS_ORIGIN": "https://web-clinica-monteluz.vercel.app",
-    "RATE_LIMIT_WINDOW_MS": "900000",
-    "RATE_LIMIT_MAX_REQUESTS": "100"
-  },
   "functions": {
     "api/index.js": {
       "maxDuration": 30
