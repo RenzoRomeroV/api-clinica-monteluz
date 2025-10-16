@@ -4,19 +4,13 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Configuración de Supabase
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseUrl = process.env.SUPABASE_URL || 'https://iymqxetynnfhnkwbsypv.supabase.co';
+const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5bXF4ZXR5bm5mZmt3YnN5cHYiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNzA0NzQwMCwiZXhwIjoyMDUyNjIzNDAwfQ.placeholder';
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn('⚠️  Advertencia: SUPABASE_URL y SUPABASE_KEY no están definidos. Usando valores por defecto.');
-  // No salir del proceso, continuar con valores por defecto
-}
+console.log('🔗 Conectando a Supabase:', supabaseUrl);
 
 // Cliente de Supabase
-export const supabase = createClient(
-  supabaseUrl || 'https://placeholder.supabase.co', 
-  supabaseKey || 'placeholder-key'
-);
+export const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Función para verificar la conexión
 export const verificarConexion = async () => {

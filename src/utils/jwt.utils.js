@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 export const generarToken = (payload) => {
   return jwt.sign(
     payload,
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || 'RomeroValverde200324*',
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
 };
@@ -16,7 +16,7 @@ export const generarToken = (payload) => {
  */
 export const verificarToken = (token) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, process.env.JWT_SECRET || 'RomeroValverde200324*');
   } catch (error) {
     return null;
   }
