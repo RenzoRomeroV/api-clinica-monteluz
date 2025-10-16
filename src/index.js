@@ -18,11 +18,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors({
-  origin: [
-    'http://localhost:4200',
-    'https://web-clinica-monteluz.vercel.app',
-    'https://web-monteluz.vercel.app'
-  ],
+  origin: true, // Permitir todos los orígenes temporalmente para solucionar el problema
   credentials: true
 }));
 app.use(express.json());
