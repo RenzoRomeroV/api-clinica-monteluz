@@ -8,12 +8,15 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 
 if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Error: SUPABASE_URL y SUPABASE_KEY deben estar definidos en .env');
-  process.exit(1);
+  console.warn('⚠️  Advertencia: SUPABASE_URL y SUPABASE_KEY no están definidos. Usando valores por defecto.');
+  // No salir del proceso, continuar con valores por defecto
 }
 
 // Cliente de Supabase
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(
+  supabaseUrl || 'https://placeholder.supabase.co', 
+  supabaseKey || 'placeholder-key'
+);
 
 // Función para verificar la conexión
 export const verificarConexion = async () => {
