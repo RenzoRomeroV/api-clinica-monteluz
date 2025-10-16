@@ -65,7 +65,7 @@ CREATE INDEX idx_usuarios_activo ON usuarios(activo);
 CREATE INDEX idx_usuarios_departamento ON usuarios(departamento);
 
 -- ============================================
--- TABLA: doctores
+-- TABLA: doctores-----
 -- ============================================
 CREATE TABLE IF NOT EXISTS doctores (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
