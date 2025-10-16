@@ -36,3 +36,5 @@ export const verificarConexion = async () => {
 export default supabase;
 
 
+
+

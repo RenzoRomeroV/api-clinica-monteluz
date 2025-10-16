@@ -18,3 +18,5 @@ export const compararPassword = async (password, passwordEncriptado) => {
 export default { encriptarPassword, compararPassword };
 
 
+
+

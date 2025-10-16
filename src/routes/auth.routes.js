@@ -1,6 +1,7 @@
 import express from 'express';
 import { body } from 'express-validator';
 import { login, register, logout, verificarTokenController } from '../controllers/auth.controller.js';
+import { loginAdmin, verificarTokenAdmin } from '../controllers/auth-admin.controller.js';
 import { manejarErroresValidacion } from '../middleware/validator.middleware.js';
 
 const router = express.Router();
@@ -48,6 +49,27 @@ router.post('/logout', logout);
  * @access  Private
  */
 router.get('/verify', verificarTokenController);
+
+/**
+ * @route   POST /api/auth/login-admin
+ * @desc    Iniciar sesión como administrador
+ * @access  Public
+ */
+router.post('/login-admin',
+  [
+    body('email').isEmail().withMessage('Email inválido'),
+    body('password').notEmpty().withMessage('Contraseña requerida'),
+    manejarErroresValidacion
+  ],
+  loginAdmin
+);
+
+/**
+ * @route   GET /api/auth/verify-admin
+ * @desc    Verificar token de administrador
+ * @access  Private
+ */
+router.get('/verify-admin', verificarTokenAdmin);
 
 // Ruta de prueba de conexión
 router.get('/test', async (req, res) => {

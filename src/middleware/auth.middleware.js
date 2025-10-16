@@ -53,3 +53,5 @@ export const verificarRol = (...rolesPermitidos) => {
 export default { verificarToken, verificarRol };
 
 
+
+

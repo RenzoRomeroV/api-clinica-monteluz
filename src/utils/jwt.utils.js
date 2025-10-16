@@ -25,3 +25,5 @@ export const verificarToken = (token) => {
 export default { generarToken, verificarToken };
 
 
+
+

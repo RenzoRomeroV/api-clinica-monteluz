@@ -177,3 +177,5 @@ export const verificarTokenController = async (req, res) => {
 export default { login, register, logout, verificarTokenController };
 
 
+
+
