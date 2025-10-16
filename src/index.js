@@ -18,7 +18,11 @@ const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:4200',
+  origin: [
+    'http://localhost:4200',
+    'https://web-clinica-monteluz.vercel.app',
+    'https://web-monteluz.vercel.app'
+  ],
   credentials: true
 }));
 app.use(express.json());
