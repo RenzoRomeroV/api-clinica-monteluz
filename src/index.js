@@ -28,8 +28,9 @@ app.use(express.urlencoded({ extended: true }));
 app.get('/', (req, res) => {
   res.json({
     message: '🏥 API Clínica Monteluz - Funcionando correctamente',
-    version: '1.0.0',
-    status: 'OK'
+    version: '1.0.1',
+    status: 'OK',
+    lastUpdate: new Date().toISOString()
   });
 });
 
