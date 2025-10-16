@@ -1,37 +1,73 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
-dotenv.config();
+// Cargar variables de entorno desde config.env
+dotenv.config({ path: './config.env' });
 
 // Configuración de Supabase
-const supabaseUrl = process.env.SUPABASE_URL || 'https://iymqxetynnfhnkwbsypv.supabase.co';
-const supabaseKey = process.env.SUPABASE_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml5bXF4ZXR5bm5mZmt3YnN5cHYiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTczNzA0NzQwMCwiZXhwIjoyMDUyNjIzNDAwfQ.placeholder';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
-console.log('🔗 Conectando a Supabase:', supabaseUrl);
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Faltan variables de entorno de Supabase');
+}
 
-// Cliente de Supabase
+// Cliente de Supabase para operaciones públicas
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Función para verificar la conexión
-export const verificarConexion = async () => {
+// Cliente de Supabase para operaciones administrativas
+export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+});
+
+// Función para probar la conexión
+export const testConnection = async () => {
   try {
     const { data, error } = await supabase
       .from('usuarios')
       .select('count')
       .limit(1);
     
-    if (error) throw error;
+    if (error) {
+      console.error('Error de conexión a Supabase:', error);
+      return false;
+    }
     
-    console.log('✅ Conexión a Supabase establecida correctamente');
+    console.log('✅ Conexión a Supabase exitosa');
     return true;
   } catch (error) {
-    console.error('❌ Error al conectar con Supabase:', error.message);
+    console.error('Error de conexión a Supabase:', error);
     return false;
   }
 };
 
-export default supabase;
-
-
-
-
+// Función para obtener información de la base de datos
+export const getDatabaseInfo = async () => {
+  try {
+    const { data: usuarios, error: usuariosError } = await supabase
+      .from('usuarios')
+      .select('count', { count: 'exact', head: true });
+    
+    const { data: especialidades, error: especialidadesError } = await supabase
+      .from('especialidades')
+      .select('count', { count: 'exact', head: true });
+    
+    return {
+      usuarios: usuariosError ? 0 : usuarios,
+      especialidades: especialidadesError ? 0 : especialidades,
+      status: 'connected'
+    };
+  } catch (error) {
+    console.error('Error obteniendo información de la base de datos:', error);
+    return {
+      usuarios: 0,
+      especialidades: 0,
+      status: 'error',
+      error: error.message
+    };
+  }
+};

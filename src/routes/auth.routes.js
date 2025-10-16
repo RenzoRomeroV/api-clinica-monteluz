@@ -1,8 +1,13 @@
 import express from 'express';
-import { body } from 'express-validator';
-import { login, register, logout, verificarTokenController } from '../controllers/auth.controller.js';
-import { loginAdmin, verificarTokenAdmin } from '../controllers/auth-admin.controller.js';
-import { manejarErroresValidacion } from '../middleware/validator.middleware.js';
+import { AuthController } from '../controllers/auth.controller.js';
+import { authenticate } from '../middleware/auth.middleware.js';
+import {
+  validateLogin,
+  validateRegister,
+  validateChangePassword,
+  validateUpdateProfile,
+  validateVerifyToken
+} from '../validators/auth.validator.js';
 
 const router = express.Router();
 
@@ -11,95 +16,62 @@ const router = express.Router();
  * @desc    Iniciar sesión
  * @access  Public
  */
-router.post('/login',
-  [
-    body('email').isEmail().withMessage('Email inválido'),
-    body('password').notEmpty().withMessage('Contraseña requerida'),
-    manejarErroresValidacion
-  ],
-  login
-);
-
-/**
- * @route   POST /api/auth/register
- * @desc    Registrar nuevo usuario
- * @access  Public
- */
-router.post('/register',
-  [
-    body('email').isEmail().withMessage('Email inválido'),
-    body('password').isLength({ min: 6 }).withMessage('Contraseña debe tener al menos 6 caracteres'),
-    body('nombre').notEmpty().withMessage('Nombre requerido'),
-    body('apellido').notEmpty().withMessage('Apellido requerido'),
-    manejarErroresValidacion
-  ],
-  register
-);
-
-/**
- * @route   POST /api/auth/logout
- * @desc    Cerrar sesión
- * @access  Private
- */
-router.post('/logout', logout);
-
-/**
- * @route   GET /api/auth/verify
- * @desc    Verificar token
- * @access  Private
- */
-router.get('/verify', verificarTokenController);
+router.post('/login', validateLogin, AuthController.login);
 
 /**
  * @route   POST /api/auth/login-admin
  * @desc    Iniciar sesión como administrador
  * @access  Public
  */
-router.post('/login-admin',
-  [
-    body('email').isEmail().withMessage('Email inválido'),
-    body('password').notEmpty().withMessage('Contraseña requerida'),
-    manejarErroresValidacion
-  ],
-  loginAdmin
-);
+router.post('/login-admin', validateLogin, AuthController.loginAdmin);
 
 /**
- * @route   GET /api/auth/verify-admin
- * @desc    Verificar token de administrador
+ * @route   POST /api/auth/register
+ * @desc    Registrar nuevo usuario
+ * @access  Public
+ */
+router.post('/register', validateRegister, AuthController.register);
+
+/**
+ * @route   POST /api/auth/verify
+ * @desc    Verificar token JWT
+ * @access  Public
+ */
+router.post('/verify', validateVerifyToken, AuthController.verifyToken);
+
+/**
+ * @route   GET /api/auth/profile
+ * @desc    Obtener perfil del usuario autenticado
  * @access  Private
  */
-router.get('/verify-admin', verificarTokenAdmin);
+router.get('/profile', authenticate, AuthController.getProfile);
 
-// Ruta de prueba de conexión
-router.get('/test', async (req, res) => {
-  try {
-    const { verificarConexion } = await import('../config/database.js');
-    const conexionOk = await verificarConexion();
-    
-    if (conexionOk) {
-      res.json({
-        message: '✅ Conexión a Supabase exitosa',
-        timestamp: new Date().toISOString(),
-        status: 'OK'
-      });
-    } else {
-      res.status(500).json({
-        message: '❌ Error de conexión a Supabase',
-        timestamp: new Date().toISOString(),
-        status: 'ERROR'
-      });
-    }
-  } catch (error) {
-    res.status(500).json({
-      message: '❌ Error al verificar conexión',
-      error: error.message,
-      timestamp: new Date().toISOString(),
-      status: 'ERROR'
-    });
-  }
-});
+/**
+ * @route   PUT /api/auth/profile
+ * @desc    Actualizar perfil del usuario autenticado
+ * @access  Private
+ */
+router.put('/profile', authenticate, validateUpdateProfile, AuthController.updateProfile);
+
+/**
+ * @route   POST /api/auth/change-password
+ * @desc    Cambiar contraseña del usuario autenticado
+ * @access  Private
+ */
+router.post('/change-password', authenticate, validateChangePassword, AuthController.changePassword);
+
+/**
+ * @route   POST /api/auth/logout
+ * @desc    Cerrar sesión
+ * @access  Private
+ */
+router.post('/logout', authenticate, AuthController.logout);
+
+/**
+ * @route   GET /api/auth/test
+ * @desc    Probar conexión con el servidor
+ * @access  Public
+ */
+router.get('/test', AuthController.testConnection);
 
 export default router;
-
-
