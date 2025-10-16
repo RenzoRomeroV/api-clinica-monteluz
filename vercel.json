@@ -1,5 +1,6 @@
 {
   "version": 2,
+  "comment": "Forzar deployment - última actualización",
   "builds": [
     {
       "src": "api/index.js",
