@@ -11,8 +11,10 @@ import { testConnection, getDatabaseInfo } from './config/database.js';
 // Importar rutas
 import authRoutes from './routes/auth.routes.js';
 
-// Configuración - Cargar desde config.env
-dotenv.config({ path: './config.env' });
+// Configuración - Cargar desde config.env (solo en desarrollo)
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: './config.env' });
+}
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -58,7 +60,6 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:4200',
       'http://localhost:3000',
-      'https://clinica-monteluz.vercel.app',
       process.env.CORS_ORIGIN
     ].filter(Boolean);
     

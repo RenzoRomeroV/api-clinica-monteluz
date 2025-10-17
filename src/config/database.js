@@ -1,8 +1,10 @@
 import { createClient } from '@supabase/supabase-js';
 import dotenv from 'dotenv';
 
-// Cargar variables de entorno desde config.env
-dotenv.config({ path: './config.env' });
+// Cargar variables de entorno desde config.env (solo en desarrollo)
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config({ path: './config.env' });
+}
 
 // Configuración de Supabase
 const supabaseUrl = process.env.SUPABASE_URL;
