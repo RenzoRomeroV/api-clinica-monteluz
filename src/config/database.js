@@ -11,12 +11,19 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_ANON_KEY;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY;
 
+console.log('🔍 Debug - SUPABASE_URL:', supabaseUrl ? '✅ Presente' : '❌ Faltante');
+console.log('🔍 Debug - SUPABASE_ANON_KEY:', supabaseKey ? '✅ Presente' : '❌ Faltante');
+
 if (!supabaseUrl || !supabaseKey) {
   throw new Error('Faltan variables de entorno de Supabase');
 }
 
 // Cliente de Supabase para operaciones públicas
-export const supabase = createClient(supabaseUrl, supabaseKey);
+export const supabase = createClient(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: false
+  }
+});
 
 // Cliente de Supabase para operaciones administrativas
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
