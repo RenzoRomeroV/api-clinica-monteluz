@@ -581,4 +581,68 @@ export class AuthController {
       });
     }
   }
+
+  static async updateAdminPassword(req, res) {
+    try {
+      console.log('🔍 Debug - updateAdminPassword iniciado');
+
+      // Generar hash correcto para admin123
+      const bcrypt = await import('bcryptjs');
+      const hashedPassword = await bcrypt.hash('admin123', 12);
+      console.log('🔍 Debug - Hash generado:', hashedPassword);
+
+      // Eliminar administrador existente
+      const { error: deleteError } = await supabase
+        .from('administradores')
+        .delete()
+        .eq('correo', 'admin@monteluz.com');
+
+      if (deleteError) {
+        console.error('Error eliminando administrador:', deleteError);
+      }
+
+      // Insertar administrador con hash correcto
+      const { data, error } = await supabase
+        .from('administradores')
+        .insert({
+          dni: '12345678',
+          nombre: 'Administrador',
+          apellidos: 'Principal',
+          fecha_nacimiento: '1990-01-01',
+          correo: 'admin@monteluz.com',
+          contraseña: hashedPassword,
+          direccion: 'Av. Principal 123',
+          departamento: 'Lima',
+          provincia: 'Lima',
+          distrito: 'Miraflores',
+          telefono: '987654321',
+          estado: 1
+        })
+        .select();
+
+      if (error) {
+        console.error('Error insertando administrador:', error);
+        return res.status(500).json({
+          success: false,
+          message: 'Error actualizando administrador',
+          error: error.message
+        });
+      }
+
+      res.json({
+        success: true,
+        message: 'Administrador actualizado exitosamente',
+        admin: data[0],
+        hash: hashedPassword
+      });
+
+    } catch (error) {
+      console.error('Error en updateAdminPassword:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
 }

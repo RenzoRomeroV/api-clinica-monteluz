@@ -82,6 +82,13 @@ router.get('/test', AuthController.testConnection);
 router.post('/create-admin', AuthController.createAdmin);
 
 /**
+ * @route   POST /api/auth/update-admin-password
+ * @desc    Actualizar contraseña del administrador
+ * @access  Public
+ */
+router.post('/update-admin-password', AuthController.updateAdminPassword);
+
+/**
  * @route   GET /api/auth/db-config
  * @desc    Mostrar configuración de la base de datos
  * @access  Public

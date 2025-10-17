@@ -1,102 +1,241 @@
 -- ============================================
--- VERIFICAR SISTEMA COMPLETO
--- Ejecutar para verificar que todo funciona
+-- VERIFICAR SISTEMA - CLÍNICA MONTELUZ
+-- Ejecutar para verificar que todo esté funcionando
 -- ============================================
 
--- Verificar todas las tablas creadas
+-- ============================================
+-- VERIFICAR TABLAS CREADAS
+-- ============================================
+SELECT 
+    table_name,
+    table_type
+FROM information_schema.tables 
+WHERE table_schema = 'public' 
+AND table_type = 'BASE TABLE'
+ORDER BY table_name;
+
+-- ============================================
+-- VERIFICAR ADMINISTRADORES
+-- ============================================
+SELECT 
+    id,
+    dni,
+    nombre,
+    apellidos,
+    correo,
+    estado,
+    created_at
+FROM administradores
+ORDER BY id;
+
+-- ============================================
+-- VERIFICAR USUARIOS (PACIENTES)
+-- ============================================
+SELECT 
+    id,
+    dni,
+    nombre,
+    apellidos,
+    correo,
+    activo,
+    created_at
+FROM usuarios
+ORDER BY id;
+
+-- ============================================
+-- VERIFICAR DOCTORES
+-- ============================================
+SELECT 
+    d.id,
+    d.dni,
+    d.nombre,
+    d.apellidos,
+    d.correo,
+    d.numero_colegiatura,
+    e.nombre as especialidad,
+    d.activo
+FROM doctores d
+LEFT JOIN especialidades e ON d.especialidad_id = e.id
+ORDER BY d.id;
+
+-- ============================================
+-- VERIFICAR ESPECIALIDADES
+-- ============================================
+SELECT 
+    id,
+    nombre,
+    descripcion,
+    activo
+FROM especialidades
+ORDER BY id;
+
+-- ============================================
+-- VERIFICAR SEDES
+-- ============================================
+SELECT 
+    id,
+    nombre,
+    direccion,
+    departamento,
+    provincia,
+    distrito,
+    telefono,
+    activo
+FROM sedes
+ORDER BY id;
+
+-- ============================================
+-- VERIFICAR MEDICAMENTOS
+-- ============================================
+SELECT 
+    id,
+    nombre,
+    precio,
+    stock,
+    principio_activo,
+    laboratorio,
+    activo
+FROM medicamentos
+ORDER BY id;
+
+-- ============================================
+-- VERIFICAR CITAS
+-- ============================================
+SELECT 
+    c.id,
+    u.nombre || ' ' || u.apellidos as paciente,
+    d.nombre || ' ' || d.apellidos as doctor,
+    s.nombre as sede,
+    c.fecha,
+    c.hora,
+    c.estado,
+    c.motivo
+FROM citas c
+LEFT JOIN usuarios u ON c.paciente_id = u.id
+LEFT JOIN doctores d ON c.doctor_id = d.id
+LEFT JOIN sedes s ON c.sede_id = s.id
+ORDER BY c.fecha, c.hora;
+
+-- ============================================
+-- VERIFICAR HORARIOS DE DOCTORES
+-- ============================================
+SELECT 
+    h.id,
+    d.nombre || ' ' || d.apellidos as doctor,
+    s.nombre as sede,
+    CASE h.dia_semana
+        WHEN 0 THEN 'Domingo'
+        WHEN 1 THEN 'Lunes'
+        WHEN 2 THEN 'Martes'
+        WHEN 3 THEN 'Miércoles'
+        WHEN 4 THEN 'Jueves'
+        WHEN 5 THEN 'Viernes'
+        WHEN 6 THEN 'Sábado'
+    END as dia,
+    h.hora_inicio,
+    h.hora_fin,
+    h.activo
+FROM horarios_doctores h
+LEFT JOIN doctores d ON h.doctor_id = d.id
+LEFT JOIN sedes s ON h.sede_id = s.id
+ORDER BY h.doctor_id, h.dia_semana;
+
+-- ============================================
+-- VERIFICAR MENSAJES DE CONTACTO
+-- ============================================
+SELECT 
+    id,
+    nombre,
+    email,
+    asunto,
+    leido,
+    respondido,
+    created_at
+FROM contacto_mensajes
+ORDER BY created_at DESC;
+
+-- ============================================
+-- VERIFICAR FUNCIONES Y TRIGGERS
+-- ============================================
+SELECT 
+    routine_name,
+    routine_type
+FROM information_schema.routines 
+WHERE routine_schema = 'public'
+ORDER BY routine_name;
+
+-- ============================================
+-- VERIFICAR ÍNDICES
+-- ============================================
 SELECT 
     schemaname,
     tablename,
-    tableowner
-FROM pg_tables 
-WHERE schemaname = 'public' 
-ORDER BY tablename;
+    indexname,
+    indexdef
+FROM pg_indexes 
+WHERE schemaname = 'public'
+ORDER BY tablename, indexname;
 
--- Verificar administrador
+-- ============================================
+-- VERIFICAR POLÍTICAS RLS
+-- ============================================
 SELECT 
-    '👑 ADMINISTRADOR' as tipo,
-    email,
-    nombre || ' ' || apellido as nombre_completo,
-    rol,
-    activo,
-    created_at
-FROM usuarios 
-WHERE rol = 'admin';
+    schemaname,
+    tablename,
+    policyname,
+    permissive,
+    roles,
+    cmd,
+    qual
+FROM pg_policies 
+WHERE schemaname = 'public'
+ORDER BY tablename, policyname;
 
--- Verificar especialidades creadas
+-- ============================================
+-- RESUMEN DE DATOS
+-- ============================================
 SELECT 
-    '🩺 ESPECIALIDADES' as tipo,
-    nombre,
-    descripcion,
-    icono,
-    activo
-FROM especialidades 
-ORDER BY nombre;
-
--- Verificar estructura de tabla usuarios
+    'Administradores' as tabla,
+    COUNT(*) as total
+FROM administradores
+UNION ALL
 SELECT 
-    column_name,
-    data_type,
-    is_nullable,
-    column_default
-FROM information_schema.columns 
-WHERE table_name = 'usuarios' 
-ORDER BY ordinal_position;
-
--- Contar registros por tabla
-SELECT 
-    'usuarios' as tabla,
-    COUNT(*) as registros
+    'Usuarios (Pacientes)' as tabla,
+    COUNT(*) as total
 FROM usuarios
 UNION ALL
 SELECT 
-    'especialidades' as tabla,
-    COUNT(*) as registros
-FROM especialidades
-UNION ALL
-SELECT 
-    'doctores' as tabla,
-    COUNT(*) as registros
+    'Doctores' as tabla,
+    COUNT(*) as total
 FROM doctores
 UNION ALL
 SELECT 
-    'pacientes' as tabla,
-    COUNT(*) as registros
-FROM pacientes
+    'Especialidades' as tabla,
+    COUNT(*) as total
+FROM especialidades
 UNION ALL
 SELECT 
-    'sedes' as tabla,
-    COUNT(*) as registros
+    'Sedes' as tabla,
+    COUNT(*) as total
 FROM sedes
 UNION ALL
 SELECT 
-    'servicios' as tabla,
-    COUNT(*) as registros
-FROM servicios
+    'Medicamentos' as tabla,
+    COUNT(*) as total
+FROM medicamentos
 UNION ALL
 SELECT 
-    'citas' as tabla,
-    COUNT(*) as registros
+    'Citas' as tabla,
+    COUNT(*) as total
 FROM citas
 UNION ALL
 SELECT 
-    'horarios_doctores' as tabla,
-    COUNT(*) as registros
+    'Horarios' as tabla,
+    COUNT(*) as total
 FROM horarios_doctores
 UNION ALL
 SELECT 
-    'contacto_mensajes' as tabla,
-    COUNT(*) as registros
-FROM contacto_mensajes;
-
--- Verificar que la contraseña está encriptada
-SELECT 
-    '🔐 SEGURIDAD' as tipo,
-    email,
-    CASE 
-        WHEN password LIKE '$2b$%' THEN '✅ Contraseña encriptada (bcrypt)'
-        ELSE '❌ Contraseña NO encriptada'
-    END as estado_password,
-    rol
-FROM usuarios 
-WHERE rol = 'admin';
+    'Mensajes de Contacto' as tabla,
+    COUNT(*) as total
+FROM contacto_mensajes
+ORDER BY tabla;

@@ -3,14 +3,11 @@
 -- PostgreSQL / Supabase
 -- ============================================
 
--- Habilitar extensiones necesarias
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 -- ============================================
 -- TABLA: administradores
 -- ============================================
 CREATE TABLE IF NOT EXISTS administradores (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id SERIAL PRIMARY KEY,
   dni TEXT UNIQUE NOT NULL,
   nombre TEXT NOT NULL,
   apellidos TEXT NOT NULL,
@@ -21,6 +18,7 @@ CREATE TABLE IF NOT EXISTS administradores (
   departamento TEXT,
   provincia TEXT,
   distrito TEXT,
+  telefono TEXT,
   estado INTEGER NOT NULL DEFAULT 1 CHECK (estado IN (1, 2)), -- 1=Activo, 2=Inactivo
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -35,7 +33,7 @@ CREATE INDEX idx_administradores_estado ON administradores(estado);
 -- TABLA: usuarios (Solo pacientes)
 -- ============================================
 CREATE TABLE IF NOT EXISTS usuarios (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id SERIAL PRIMARY KEY,
   dni TEXT UNIQUE NOT NULL,
   nombre TEXT NOT NULL,
   apellidos TEXT NOT NULL,
@@ -65,10 +63,10 @@ CREATE INDEX idx_usuarios_activo ON usuarios(activo);
 CREATE INDEX idx_usuarios_departamento ON usuarios(departamento);
 
 -- ============================================
--- TABLA: doctores-----
+-- TABLA: doctores
 -- ============================================
 CREATE TABLE IF NOT EXISTS doctores (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id SERIAL PRIMARY KEY,
   dni TEXT UNIQUE NOT NULL,
   nombre TEXT NOT NULL,
   apellidos TEXT NOT NULL,
@@ -78,9 +76,13 @@ CREATE TABLE IF NOT EXISTS doctores (
   telefono TEXT,
   contraseña TEXT NOT NULL,
   numero_colegiatura TEXT UNIQUE NOT NULL,
-  especialidad_id UUID, -- Se agregará FK después de crear especialidades
+  especialidad_id INTEGER, -- Se agregará FK después de crear especialidades
   biografia TEXT,
   años_experiencia INTEGER,
+  direccion TEXT,
+  departamento TEXT,
+  provincia TEXT,
+  distrito TEXT,
   activo BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -96,10 +98,9 @@ CREATE INDEX idx_doctores_activo ON doctores(activo);
 -- TABLA: especialidades
 -- ============================================
 CREATE TABLE IF NOT EXISTS especialidades (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id SERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
   descripcion TEXT,
-  icono TEXT,
   activo BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -113,17 +114,18 @@ CREATE INDEX idx_especialidades_activo ON especialidades(activo);
 -- TABLA: sedes
 -- ============================================
 CREATE TABLE IF NOT EXISTS sedes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id SERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
   direccion TEXT NOT NULL,
-  ciudad TEXT NOT NULL,
+  departamento TEXT,
+  provincia TEXT,
+  distrito TEXT,
   telefono TEXT,
   email TEXT,
   horario_apertura TIME,
   horario_cierre TIME,
   latitud DECIMAL(10, 8),
   longitud DECIMAL(11, 8),
-  foto_url TEXT,
   activo BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
@@ -131,38 +133,41 @@ CREATE TABLE IF NOT EXISTS sedes (
 
 -- Índices para sedes
 CREATE INDEX idx_sedes_nombre ON sedes(nombre);
-CREATE INDEX idx_sedes_ciudad ON sedes(ciudad);
+CREATE INDEX idx_sedes_departamento ON sedes(departamento);
 CREATE INDEX idx_sedes_activo ON sedes(activo);
 
 -- ============================================
--- TABLA: servicios
+-- TABLA: medicamentos
 -- ============================================
-CREATE TABLE IF NOT EXISTS servicios (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+CREATE TABLE IF NOT EXISTS medicamentos (
+  id SERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
   descripcion TEXT,
-  duracion_minutos INTEGER,
-  precio DECIMAL(10, 2),
-  especialidad_id UUID REFERENCES especialidades(id),
-  icono TEXT,
+  precio DECIMAL(10, 2) NOT NULL,
+  stock INTEGER NOT NULL DEFAULT 0,
+  imagen_url TEXT,
+  principio_activo TEXT,
+  presentacion TEXT,
+  laboratorio TEXT,
   activo BOOLEAN DEFAULT true,
   created_at TIMESTAMP DEFAULT NOW(),
   updated_at TIMESTAMP DEFAULT NOW()
 );
 
--- Índices para servicios
-CREATE INDEX idx_servicios_especialidad ON servicios(especialidad_id);
-CREATE INDEX idx_servicios_activo ON servicios(activo);
+-- Índices para medicamentos
+CREATE INDEX idx_medicamentos_nombre ON medicamentos(nombre);
+CREATE INDEX idx_medicamentos_principio_activo ON medicamentos(principio_activo);
+CREATE INDEX idx_medicamentos_activo ON medicamentos(activo);
+CREATE INDEX idx_medicamentos_stock ON medicamentos(stock);
 
 -- ============================================
 -- TABLA: citas
 -- ============================================
 CREATE TABLE IF NOT EXISTS citas (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  paciente_id UUID REFERENCES usuarios(id) ON DELETE CASCADE,
-  doctor_id UUID REFERENCES doctores(id) ON DELETE CASCADE,
-  servicio_id UUID REFERENCES servicios(id),
-  sede_id UUID REFERENCES sedes(id),
+  id SERIAL PRIMARY KEY,
+  paciente_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE,
+  doctor_id INTEGER REFERENCES doctores(id) ON DELETE CASCADE,
+  sede_id INTEGER REFERENCES sedes(id),
   fecha DATE NOT NULL,
   hora TIME NOT NULL,
   estado TEXT NOT NULL CHECK (estado IN ('pendiente', 'confirmada', 'cancelada', 'completada')) DEFAULT 'pendiente',
@@ -182,9 +187,9 @@ CREATE INDEX idx_citas_estado ON citas(estado);
 -- TABLA: horarios_doctores
 -- ============================================
 CREATE TABLE IF NOT EXISTS horarios_doctores (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  doctor_id UUID REFERENCES doctores(id) ON DELETE CASCADE,
-  sede_id UUID REFERENCES sedes(id),
+  id SERIAL PRIMARY KEY,
+  doctor_id INTEGER REFERENCES doctores(id) ON DELETE CASCADE,
+  sede_id INTEGER REFERENCES sedes(id),
   dia_semana INTEGER CHECK (dia_semana BETWEEN 0 AND 6), -- 0=Domingo, 6=Sábado
   hora_inicio TIME NOT NULL,
   hora_fin TIME NOT NULL,
@@ -201,7 +206,7 @@ CREATE INDEX idx_horarios_sede ON horarios_doctores(sede_id);
 -- TABLA: contacto_mensajes
 -- ============================================
 CREATE TABLE IF NOT EXISTS contacto_mensajes (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  id SERIAL PRIMARY KEY,
   nombre TEXT NOT NULL,
   email TEXT NOT NULL,
   telefono TEXT,
@@ -254,13 +259,18 @@ CREATE TRIGGER trigger_doctores_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION actualizar_updated_at();
 
+CREATE TRIGGER trigger_especialidades_updated_at
+  BEFORE UPDATE ON especialidades
+  FOR EACH ROW
+  EXECUTE FUNCTION actualizar_updated_at();
+
 CREATE TRIGGER trigger_sedes_updated_at
   BEFORE UPDATE ON sedes
   FOR EACH ROW
   EXECUTE FUNCTION actualizar_updated_at();
 
-CREATE TRIGGER trigger_servicios_updated_at
-  BEFORE UPDATE ON servicios
+CREATE TRIGGER trigger_medicamentos_updated_at
+  BEFORE UPDATE ON medicamentos
   FOR EACH ROW
   EXECUTE FUNCTION actualizar_updated_at();
 
@@ -268,54 +278,6 @@ CREATE TRIGGER trigger_citas_updated_at
   BEFORE UPDATE ON citas
   FOR EACH ROW
   EXECUTE FUNCTION actualizar_updated_at();
-
-CREATE TRIGGER trigger_especialidades_updated_at
-  BEFORE UPDATE ON especialidades
-  FOR EACH ROW
-  EXECUTE FUNCTION actualizar_updated_at();
-
--- ============================================
--- DATOS INICIALES
--- ============================================
-
--- Insertar especialidades de ejemplo
-INSERT INTO especialidades (nombre, descripcion, icono) VALUES
-  ('Medicina General', 'Atención médica general y preventiva', '🩺'),
-  ('Pediatría', 'Atención especializada para niños', '👶'),
-  ('Cardiología', 'Especialistas en salud cardiovascular', '❤️'),
-  ('Dermatología', 'Cuidado de la piel', '🧴'),
-  ('Traumatología', 'Lesiones y fracturas', '🦴'),
-  ('Ginecología', 'Salud de la mujer', '👩‍⚕️'),
-  ('Oftalmología', 'Cuidado de la vista', '👁️'),
-  ('Odontología', 'Salud dental', '🦷')
-ON CONFLICT DO NOTHING;
-
--- Insertar administrador principal
-INSERT INTO administradores (
-    dni,
-    nombre,
-    apellidos,
-    fecha_nacimiento,
-    correo,
-    contraseña,
-    direccion,
-    departamento,
-    provincia,
-    distrito,
-    estado
-) VALUES (
-    '12345678',
-    'Administrador',
-    'Principal',
-    '1990-01-01',
-    'admin@monteluz.com',
-    '$2b$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', -- password: admin123
-    'Av. Principal 123',
-    'Lima',
-    'Lima',
-    'Miraflores',
-    1
-);
 
 -- ============================================
 -- POLÍTICAS DE SEGURIDAD (Row Level Security)
@@ -327,7 +289,7 @@ ALTER TABLE usuarios ENABLE ROW LEVEL SECURITY;
 ALTER TABLE doctores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE especialidades ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sedes ENABLE ROW LEVEL SECURITY;
-ALTER TABLE servicios ENABLE ROW LEVEL SECURITY;
+ALTER TABLE medicamentos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE citas ENABLE ROW LEVEL SECURITY;
 ALTER TABLE horarios_doctores ENABLE ROW LEVEL SECURITY;
 
@@ -340,7 +302,3 @@ CREATE POLICY "Administradores pueden ver todos los datos"
 CREATE POLICY "Administradores pueden ver todos los doctores"
   ON doctores FOR ALL
   USING (true);
-
--- ============================================
--- FIN DEL SCHEMA COMPLETO
--- ============================================

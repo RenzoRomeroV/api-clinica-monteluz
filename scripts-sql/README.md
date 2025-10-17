@@ -1,72 +1,119 @@
-# 📋 SCRIPTS SQL - CLÍNICA MONTELUZ
+# Scripts SQL - Clínica Monteluz
 
-## 📁 Archivos en esta carpeta:
+Este directorio contiene los scripts SQL necesarios para configurar la base de datos de la Clínica Monteluz.
 
-### 1. `01-database-schema.sql` 🏗️
-- **Propósito:** Crear toda la estructura de la base de datos
-- **Contiene:** 9 tablas, índices, triggers, funciones, políticas de seguridad
-- **Datos iniciales:** 8 especialidades médicas
-- **Ejecutar:** PRIMERO
+## 📁 Archivos
 
-### 2. `02-crear-admin.sql` 👑
-- **Propósito:** Crear el administrador principal del sistema
-- **Credenciales:** 
-  - Email: `admin@monteluz.com`
-  - Contraseña: `admin123`
-- **Ejecutar:** SEGUNDO (después del schema)
+### 1. `00-eliminar-tablas.sql`
+**Propósito:** Eliminar todas las tablas existentes antes de crear el esquema nuevo.
+**Cuándo usar:** Antes de ejecutar el script principal de base de datos.
+**Contenido:**
+- Elimina todas las tablas en orden inverso de dependencia
+- Elimina funciones y triggers
+- Verifica que se eliminaron todas las tablas
 
-### 3. `03-verificar-sistema.sql` ✅
-- **Propósito:** Verificar que todo el sistema funciona correctamente
-- **Muestra:** Tablas creadas, administrador, especialidades, estructura
-- **Ejecutar:** TERCERO (para verificar)
+### 2. `01-database-completo.sql`
+**Propósito:** Crear el esquema completo de la base de datos.
+**Cuándo usar:** Después de eliminar las tablas existentes.
+**Contenido:**
+- Creación de todas las tablas
+- Índices para optimización
+- Foreign keys
+- Triggers para updated_at
+- Políticas de seguridad (RLS)
 
----
+### 3. `02-datos-iniciales.sql`
+**Propósito:** Insertar datos iniciales para el funcionamiento del sistema.
+**Cuándo usar:** Después de crear el esquema de base de datos.
+**Contenido:**
+- Especialidades médicas
+- Administrador principal
+- Sedes de la clínica
+- Medicamentos de ejemplo
+- Doctores de ejemplo
+- Pacientes de ejemplo
+- Horarios de doctores
+- Citas de ejemplo
 
-## 🚀 ORDEN DE EJECUCIÓN:
+### 4. `03-verificar-sistema.sql`
+**Propósito:** Verificar que todo el sistema esté funcionando correctamente.
+**Cuándo usar:** Después de insertar los datos iniciales.
+**Contenido:**
+- Verificación de tablas creadas
+- Verificación de datos insertados
+- Verificación de funciones y triggers
+- Verificación de índices
+- Verificación de políticas RLS
+- Resumen de datos
 
-```
-1️⃣ Ejecutar: 01-database-schema.sql
-2️⃣ Ejecutar: 02-crear-admin.sql  
-3️⃣ Ejecutar: 03-verificar-sistema.sql
-```
+## 🚀 Orden de Ejecución
 
----
+1. **`00-eliminar-tablas.sql`** - Limpiar base de datos
+2. **`01-database-completo.sql`** - Crear esquema
+3. **`02-datos-iniciales.sql`** - Insertar datos
+4. **`03-verificar-sistema.sql`** - Verificar funcionamiento
 
-## 📊 TABLAS CREADAS:
+## 🔑 Credenciales por Defecto
 
-1. **`usuarios`** - Usuarios del sistema (pacientes, doctores, admin)
-2. **`especialidades`** - Especialidades médicas (8 predefinidas)
-3. **`doctores`** - Información específica de doctores
-4. **`pacientes`** - Información específica de pacientes
-5. **`sedes`** - Sedes de la clínica
-6. **`servicios`** - Servicios médicos ofrecidos
-7. **`citas`** - Gestión de citas médicas
-8. **`horarios_doctores`** - Horarios de atención
-9. **`contacto_mensajes`** - Mensajes del formulario de contacto
+### Administrador
+- **Email:** `admin@monteluz.com`
+- **Contraseña:** `admin123`
 
----
+### Doctores
+- **Email:** `carlos.mendoza@monteluz.com`
+- **Contraseña:** `doctor123`
+- **Email:** `ana.garcia@monteluz.com`
+- **Contraseña:** `doctor123`
 
-## 🔐 CREDENCIALES DE ADMINISTRADOR:
+### Pacientes
+- **Email:** `juan.perez@example.com`
+- **Contraseña:** `paciente123`
+- **Email:** `maria.gonzalez@example.com`
+- **Contraseña:** `paciente123`
 
-```
-Email: admin@monteluz.com
-Contraseña: admin123
-```
+## 📊 Estructura de la Base de Datos
 
----
+### Tablas Principales
+- **administradores** - Administradores del sistema
+- **usuarios** - Pacientes registrados
+- **doctores** - Médicos de la clínica
+- **especialidades** - Especialidades médicas
+- **sedes** - Sedes de la clínica
+- **medicamentos** - Medicamentos disponibles
+- **citas** - Citas médicas
+- **horarios_doctores** - Horarios de atención
+- **contacto_mensajes** - Mensajes de contacto
 
-## ⚠️ IMPORTANTE:
+### Características
+- **IDs:** SERIAL (auto-incrementales)
+- **Timestamps:** created_at, updated_at automáticos
+- **Triggers:** Actualización automática de updated_at
+- **Índices:** Optimización de consultas
+- **RLS:** Row Level Security habilitado
+- **Validaciones:** CHECK constraints en campos importantes
 
-- Ejecutar los scripts en el **SQL Editor de Supabase**
-- Ejecutar en el **orden correcto** (01 → 02 → 03)
-- La contraseña está **encriptada con bcrypt**
-- El sistema incluye **Row Level Security (RLS)**
+## ⚠️ Notas Importantes
 
----
+1. **Ejecutar en orden:** Los scripts deben ejecutarse en el orden indicado
+2. **Backup:** Hacer backup antes de ejecutar `00-eliminar-tablas.sql`
+3. **Permisos:** Asegurar permisos de administrador en la base de datos
+4. **Variables:** Las contraseñas están hasheadas con bcrypt
+5. **Conflicto:** Los scripts usan `ON CONFLICT DO NOTHING` para evitar errores
 
-## ✅ DESPUÉS DE EJECUTAR:
+## 🔧 Solución de Problemas
 
-1. **Probar el login:** `http://localhost:4200/login-admin`
-2. **Credenciales:** `admin@monteluz.com` / `admin123`
-3. **Verificar redirección** al dashboard
-4. **Backend funcionando** en puerto 3001
+### Error de Foreign Key
+- Verificar que las tablas se crean en el orden correcto
+- Revisar que los IDs de referencia existan
+
+### Error de Permisos
+- Verificar que el usuario tenga permisos de administrador
+- Revisar políticas RLS si es necesario
+
+### Error de Datos Duplicados
+- Los scripts usan `ON CONFLICT DO NOTHING` para evitar duplicados
+- Si hay conflictos, revisar los datos existentes
+
+## 📞 Soporte
+
+Para problemas o dudas sobre los scripts, contactar al equipo de desarrollo.
