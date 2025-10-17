@@ -1,4 +1,4 @@
-import { supabase, supabaseAdmin } from '../config/database.js';
+import { supabase } from '../config/database.js';
 
 /**
  * Modelo unificado de Usuario para trabajar con las tablas separadas
@@ -13,7 +13,7 @@ export class UsuarioUnifiedModel {
   static async findByEmail(email) {
     try {
       // Buscar en administradores
-      const { data: admin, error: adminError } = await supabaseAdmin
+      const { data: admin, error: adminError } = await supabase
         .from('administradores')
         .select('*')
         .eq('correo', email)
@@ -33,7 +33,7 @@ export class UsuarioUnifiedModel {
       }
       
       // Buscar en doctores
-      const { data: doctor, error: doctorError } = await supabaseAdmin
+      const { data: doctor, error: doctorError } = await supabase
         .from('doctores')
         .select('*')
         .eq('correo', email)
@@ -53,7 +53,7 @@ export class UsuarioUnifiedModel {
       }
       
       // Buscar en usuarios (pacientes)
-      const { data: paciente, error: pacienteError } = await supabaseAdmin
+      const { data: paciente, error: pacienteError } = await supabase
         .from('usuarios')
         .select('*')
         .eq('correo', email)
@@ -87,7 +87,7 @@ export class UsuarioUnifiedModel {
   static async findById(id) {
     try {
       // Buscar en administradores
-      const { data: admin, error: adminError } = await supabaseAdmin
+      const { data: admin, error: adminError } = await supabase
         .from('administradores')
         .select('*')
         .eq('id', id)
@@ -107,7 +107,7 @@ export class UsuarioUnifiedModel {
       }
       
       // Buscar en doctores
-      const { data: doctor, error: doctorError } = await supabaseAdmin
+      const { data: doctor, error: doctorError } = await supabase
         .from('doctores')
         .select('*')
         .eq('id', id)
@@ -127,7 +127,7 @@ export class UsuarioUnifiedModel {
       }
       
       // Buscar en usuarios (pacientes)
-      const { data: paciente, error: pacienteError } = await supabaseAdmin
+      const { data: paciente, error: pacienteError } = await supabase
         .from('usuarios')
         .select('*')
         .eq('id', id)
@@ -230,7 +230,7 @@ export class UsuarioUnifiedModel {
           throw new Error('Rol no válido');
       }
       
-      const { data: newUser, error } = await supabaseAdmin
+      const { data: newUser, error } = await supabase
         .from(tabla)
         .insert([insertData])
         .select()
@@ -305,7 +305,7 @@ export class UsuarioUnifiedModel {
         if (updateData.condiciones_medicas) updateFields.condiciones_medicas = updateData.condiciones_medicas;
       }
       
-      const { data: updatedUser, error } = await supabaseAdmin
+      const { data: updatedUser, error } = await supabase
         .from(tabla)
         .update(updateFields)
         .eq('id', id)
@@ -342,7 +342,7 @@ export class UsuarioUnifiedModel {
   static async emailExists(email, excludeId = null) {
     try {
       // Verificar en administradores
-      let query = supabaseAdmin
+      let query = supabase
         .from('administradores')
         .select('id')
         .eq('correo', email);
@@ -355,7 +355,7 @@ export class UsuarioUnifiedModel {
       if (adminData && adminData.length > 0) return true;
       
       // Verificar en doctores
-      query = supabaseAdmin
+      query = supabase
         .from('doctores')
         .select('id')
         .eq('correo', email);
@@ -368,7 +368,7 @@ export class UsuarioUnifiedModel {
       if (doctorData && doctorData.length > 0) return true;
       
       // Verificar en usuarios
-      query = supabaseAdmin
+      query = supabase
         .from('usuarios')
         .select('id')
         .eq('correo', email);

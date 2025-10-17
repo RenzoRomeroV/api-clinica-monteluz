@@ -79,10 +79,14 @@ export class AuthController {
    */
   static async loginAdmin(req, res) {
     try {
+      console.log('🔍 Debug - loginAdmin iniciado');
       const { email, password } = req.body;
+      console.log('🔍 Debug - email recibido:', email);
       
       // Buscar usuario por email
+      console.log('🔍 Debug - buscando usuario en BD...');
       const usuario = await UsuarioUnifiedModel.findByEmail(email);
+      console.log('🔍 Debug - usuario encontrado:', usuario ? 'Sí' : 'No');
       
       if (!usuario) {
         return res.status(401).json({
