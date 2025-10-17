@@ -81,4 +81,11 @@ router.get('/test', AuthController.testConnection);
  */
 router.post('/create-admin', AuthController.createAdmin);
 
+/**
+ * @route   GET /api/auth/db-config
+ * @desc    Mostrar configuración de la base de datos
+ * @access  Public
+ */
+router.get('/db-config', AuthController.showDatabaseConfig);
+
 export default router;

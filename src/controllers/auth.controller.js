@@ -546,4 +546,39 @@ export class AuthController {
       });
     }
   }
+
+  /**
+   * Mostrar configuración de la base de datos
+   */
+  static async showDatabaseConfig(req, res) {
+    try {
+      const config = {
+        supabaseUrl: process.env.SUPABASE_URL ? '✅ Presente' : '❌ Faltante',
+        supabaseKey: process.env.SUPABASE_ANON_KEY ? '✅ Presente' : '❌ Faltante',
+        supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ? '✅ Presente' : '❌ Faltante',
+        nodeEnv: process.env.NODE_ENV || 'No definido',
+        timestamp: new Date().toISOString()
+      };
+
+      // Mostrar solo los primeros caracteres de las URLs por seguridad
+      if (process.env.SUPABASE_URL) {
+        config.supabaseUrlPreview = process.env.SUPABASE_URL.substring(0, 30) + '...';
+      }
+      if (process.env.SUPABASE_ANON_KEY) {
+        config.supabaseKeyPreview = process.env.SUPABASE_ANON_KEY.substring(0, 20) + '...';
+      }
+
+      res.json({
+        success: true,
+        message: 'Configuración de la base de datos',
+        config
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error al obtener configuración',
+        error: error.message
+      });
+    }
+  }
 }
