@@ -60,6 +60,9 @@ const corsOptions = {
     const allowedOrigins = [
       'http://localhost:4200',
       'http://localhost:3000',
+      'https://web-clinica-monteluz.vercel.app',
+      'https://web-monteluz.vercel.app',
+      'https://clinica-monteluz.vercel.app',
       process.env.CORS_ORIGIN
     ].filter(Boolean);
     
