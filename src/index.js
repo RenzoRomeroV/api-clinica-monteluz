@@ -56,15 +56,16 @@ const corsOptions = {
   origin: function (origin, callback) {
     // Permitir requests sin origin (mobile apps, postman, etc.)
     if (!origin) return callback(null, true);
-    
+
     const allowedOrigins = [
       'http://localhost:4200',
       'http://localhost:3000',
       'https://web-clinica-monteluz.vercel.app',
       'https://web-monteluz.vercel.app',
-      'https://clinica-monteluz.vercel.app'
+      'https://clinica-monteluz.vercel.app',
+      'https://web-clinica-monteluz-git-main-renzoromerov42-4959s-projects.vercel.app'
     ];
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
