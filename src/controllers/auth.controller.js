@@ -654,11 +654,12 @@ export class AuthController {
         .from('administradores')
         .select('*')
         .eq('correo', 'admin@monteluz.com')
-        .eq('estado', 1)
         .single();
 
+      console.log('🔍 Debug - Admin data:', admin);
+      console.log('🔍 Debug - Admin error:', error);
+
       if (error) {
-        console.error('Error buscando administrador:', error);
         return res.json({
           success: false,
           message: 'Error buscando administrador',
@@ -698,7 +699,7 @@ export class AuthController {
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
-        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        error: error.message
       });
     }
   }
