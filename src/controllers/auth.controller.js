@@ -649,24 +649,11 @@ export class AuthController {
     try {
       console.log('🔍 Debug - checkAdminExists iniciado');
 
-      // Buscar administrador por email
-      const { data: admin, error } = await supabase
-        .from('administradores')
-        .select('*')
-        .eq('correo', 'admin@monteluz.com')
-        .single();
-
+      // Usar UsuarioUnifiedModel en lugar de supabase directamente
+      const admin = await UsuarioUnifiedModel.findByEmail('admin@monteluz.com');
+      
+      console.log('🔍 Debug - Admin encontrado:', admin ? 'Sí' : 'No');
       console.log('🔍 Debug - Admin data:', admin);
-      console.log('🔍 Debug - Admin error:', error);
-
-      if (error) {
-        return res.json({
-          success: false,
-          message: 'Error buscando administrador',
-          error: error.message,
-          admin: null
-        });
-      }
 
       if (!admin) {
         return res.json({
@@ -685,10 +672,10 @@ export class AuthController {
         message: 'Administrador encontrado',
         admin: {
           id: admin.id,
-          email: admin.correo,
+          email: admin.email,
           nombre: admin.nombre,
-          apellidos: admin.apellidos,
-          estado: admin.estado,
+          apellidos: admin.apellido,
+          estado: admin.activo ? 1 : 0,
           passwordMatch: passwordMatch,
           hash: admin.contraseña
         }
