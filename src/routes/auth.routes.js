@@ -102,4 +102,11 @@ router.get('/check-admin', AuthController.checkAdminExists);
  */
 router.get('/db-config', AuthController.showDatabaseConfig);
 
+/**
+ * @route   GET /api/auth/test-login
+ * @desc    Probar endpoint de login
+ * @access  Public
+ */
+router.get('/test-login', AuthController.testLogin);
+
 export default router;

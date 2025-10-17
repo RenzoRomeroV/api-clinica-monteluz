@@ -669,4 +669,24 @@ export class AuthController {
       });
     }
   }
+
+  static async testLogin(req, res) {
+    try {
+      res.json({
+        success: true,
+        message: 'Endpoint de login funcionando',
+        credentials: {
+          email: 'admin@monteluz.com',
+          password: 'admin123'
+        },
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: 'Error en testLogin',
+        error: error.message
+      });
+    }
+  }
 }
