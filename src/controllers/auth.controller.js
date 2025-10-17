@@ -644,4 +644,62 @@ export class AuthController {
       });
     }
   }
+
+  static async checkAdminExists(req, res) {
+    try {
+      console.log('🔍 Debug - checkAdminExists iniciado');
+
+      // Buscar administrador por email
+      const { data: admin, error } = await supabase
+        .from('administradores')
+        .select('*')
+        .eq('correo', 'admin@monteluz.com')
+        .eq('estado', 1)
+        .single();
+
+      if (error) {
+        console.error('Error buscando administrador:', error);
+        return res.json({
+          success: false,
+          message: 'Error buscando administrador',
+          error: error.message,
+          admin: null
+        });
+      }
+
+      if (!admin) {
+        return res.json({
+          success: false,
+          message: 'Administrador no encontrado',
+          admin: null
+        });
+      }
+
+      // Probar comparación de contraseña
+      const passwordMatch = await comparePassword('admin123', admin.contraseña);
+      console.log('🔍 Debug - Password match:', passwordMatch);
+
+      res.json({
+        success: true,
+        message: 'Administrador encontrado',
+        admin: {
+          id: admin.id,
+          email: admin.correo,
+          nombre: admin.nombre,
+          apellidos: admin.apellidos,
+          estado: admin.estado,
+          passwordMatch: passwordMatch,
+          hash: admin.contraseña
+        }
+      });
+
+    } catch (error) {
+      console.error('Error en checkAdminExists:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
 }

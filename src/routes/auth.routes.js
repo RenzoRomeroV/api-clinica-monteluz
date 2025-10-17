@@ -89,6 +89,13 @@ router.post('/create-admin', AuthController.createAdmin);
 router.post('/update-admin-password', AuthController.updateAdminPassword);
 
 /**
+ * @route   GET /api/auth/check-admin
+ * @desc    Verificar si el administrador existe y probar contraseña
+ * @access  Public
+ */
+router.get('/check-admin', AuthController.checkAdminExists);
+
+/**
  * @route   GET /api/auth/db-config
  * @desc    Mostrar configuración de la base de datos
  * @access  Public
