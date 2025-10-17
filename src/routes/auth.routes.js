@@ -74,4 +74,11 @@ router.post('/logout', authenticate, AuthController.logout);
  */
 router.get('/test', AuthController.testConnection);
 
+/**
+ * @route   POST /api/auth/create-admin
+ * @desc    Crear administrador inicial
+ * @access  Public
+ */
+router.post('/create-admin', AuthController.createAdmin);
+
 export default router;

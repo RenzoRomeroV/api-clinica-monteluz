@@ -234,6 +234,60 @@ export class AuthController {
   }
 
   /**
+   * Crear administrador inicial
+   */
+  static async createAdmin(req, res) {
+    try {
+      console.log('🔍 Debug - createAdmin iniciado');
+      
+      // Verificar si ya existe un administrador
+      const existingAdmin = await UsuarioUnifiedModel.findByEmail('admin@monteluz.com');
+      if (existingAdmin) {
+        return res.json({
+          success: true,
+          message: 'Administrador ya existe',
+          admin: {
+            email: existingAdmin.email,
+            nombre: existingAdmin.nombre,
+            rol: existingAdmin.rol
+          }
+        });
+      }
+      
+      // Crear administrador
+      const adminData = {
+        email: 'admin@monteluz.com',
+        password: 'admin123',
+        nombre: 'Administrador',
+        apellido: 'Principal',
+        telefono: '987654321',
+        rol: 'admin',
+        activo: true
+      };
+      
+      const newAdmin = await UsuarioUnifiedModel.create(adminData);
+      
+      res.json({
+        success: true,
+        message: 'Administrador creado exitosamente',
+        admin: {
+          email: newAdmin.email,
+          nombre: newAdmin.nombre,
+          rol: newAdmin.rol
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error en createAdmin:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  }
+
+  /**
    * Verificar token
    */
   static async verifyToken(req, res) {
