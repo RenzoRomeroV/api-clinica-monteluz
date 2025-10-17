@@ -587,8 +587,7 @@ export class AuthController {
       console.log('🔍 Debug - updateAdminPassword iniciado');
 
       // Generar hash correcto para admin123
-      const bcrypt = await import('bcryptjs');
-      const hashedPassword = await bcrypt.hash('admin123', 12);
+      const hashedPassword = await hashPassword('admin123');
       console.log('🔍 Debug - Hash generado:', hashedPassword);
 
       // Eliminar administrador existente
